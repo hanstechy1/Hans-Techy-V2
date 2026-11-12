@@ -1,0 +1,24 @@
+services:
+  - type: worker
+    name: hans-techy-v2
+    runtime: node
+    plan: starter
+    region: singapore
+    branch: main
+    repo: https://github.com/hanstechy1/Hans-Techy-V2
+    buildCommand: >-
+      npm install &&
+      git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$PLUGIN_REPO_TOKEN" | base64 -w0)"
+      clone --depth 1 https://github.com/hanstechy1/PLUGIN.git private-plugins
+    startCommand: npm start
+    disk:
+      name: hans-techy-session
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SESSION_DIR
+        value: /var/data/session
+      - key: PLUGIN_REPO_TOKEN
+        sync: false
