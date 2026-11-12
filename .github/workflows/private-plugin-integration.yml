@@ -1,0 +1,49 @@
+name: Integrate private PLUGIN repository
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public bot
+        uses: actions/checkout@v4
+        with:
+          path: bot
+
+      - name: Checkout private plugins
+        uses: actions/checkout@v4
+        with:
+          repository: hanstechy1/PLUGIN
+          ref: main
+          token: ${{ secrets.PLUGIN_REPO_TOKEN }}
+          path: bot/private-plugins
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JavaScript files
+        working-directory: bot
+        run: |
+          node --check src/index.js
+          node --check src/private-plugin-loader.js
+          find private-plugins/plugins -name '*.js' -print0 | xargs -0 -r -n1 node --check
+
+      - name: Package bot with private plugins
+        uses: actions/upload-artifact@v4
+        with:
+          name: hans-techy-v2-with-private-plugins
+          path: |
+            bot/
+            !bot/node_modules/
+            !bot/session/
+          if-no-files-found: error
+          retention-days: 7
