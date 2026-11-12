@@ -1,0 +1,21 @@
+{
+  "name": "HANS TECHY V2",
+  "description": "WhatsApp automation bot powered by Baileys",
+  "stack": "heroku-24",
+  "env": {
+    "PAIRING_NUMBER": {
+      "description": "WhatsApp number with country code, digits only (example: 2557XXXXXXXX).",
+      "required": false
+    },
+    "PLUGIN_REPO_TOKEN": {
+      "description": "GitHub token with read access to private hanstechy1/PLUGIN repository.",
+      "required": false
+    },
+    "SESSION_DIR": {
+      "description": "Session directory. Heroku filesystem is ephemeral; use external persistent storage for production.",
+      "value": "/tmp/hans-techy-session",
+      "required": false
+    }
+  },
+  "formation": {}
+}
