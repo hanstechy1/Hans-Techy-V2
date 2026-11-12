@@ -15,8 +15,20 @@ async function startBot() {
   });
 
   sock.ev.on("creds.update", saveCreds);
+
+  const pairingNumber = (process.env.PAIRING_NUMBER || "").replace(/\\D/g, "");
+  if (!state.creds.registered && pairingNumber) {
+    setTimeout(async () => {
+      try {
+        const code = await sock.requestPairingCode(pairingNumber);
+        console.log("WHATSAPP PAIRING CODE:", code);
+      } catch (error) {
+        console.error("Pairing code request failed:", error?.message || error);
+      }
+    }, 3000);
+  }
   sock.ev.on("connection.update", ({ connection, lastDisconnect, qr }) => {
-    if (qr) qrcode.generate(qr, { small: true });
+    if (qr && !process.env.PAIRING_NUMBER) qrcode.generate(qr, { small: true });
     if (connection === "close") {
       const code = lastDisconnect?.error?.output?.statusCode;
       if (code !== DisconnectReason.loggedOut) startBot();
