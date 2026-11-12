@@ -42,6 +42,8 @@ jobs:
           git init
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
+          # Heroku rejects shallow pushes; fetch the complete public-repo history first.
+          git fetch --unshallow origin
           git add .
           git commit -m "Deploy HANS TECHY V2 to Heroku"
           git push "https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git" HEAD:main --force
