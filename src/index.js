@@ -1,10 +1,12 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require("@whiskeysockets/baileys");
 const pino = require("pino");
 const qrcode = require("qrcode-terminal");
+const path = require("path");
 const { runPrivatePlugins } = require("./private-plugin-loader");
 
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("session");
+  const sessionDir = process.env.SESSION_DIR || path.join(__dirname, "..", "session");
+  const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
   const sock = makeWASocket({
     auth: state,
     logger: pino({ level: "silent" }),
