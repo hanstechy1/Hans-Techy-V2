@@ -1,0 +1,46 @@
+name: Deploy HANS TECHY V2 to Heroku
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public bot repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Checkout private plugins
+        uses: actions/checkout@v4
+        with:
+          repository: hanstechy1/PLUGIN
+          token: ${{ secrets.PLUGIN_REPO_TOKEN }}
+          path: private-plugins
+          fetch-depth: 1
+
+      - name: Check required Heroku secrets
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          test -n "$HEROKU_APP_NAME" || (echo "Missing HEROKU_APP_NAME secret" && exit 1)
+          test -n "$HEROKU_API_KEY" || (echo "Missing HEROKU_API_KEY secret" && exit 1)
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          git init
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add .
+          git commit -m "Deploy HANS TECHY V2 to Heroku"
+          git push "https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git" HEAD:main --force
